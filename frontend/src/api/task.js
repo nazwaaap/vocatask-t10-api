@@ -66,3 +66,25 @@ export const updateTask = async (token, taskId, updatedTask) => {
     throw error;
   }
 };
+
+// Function untuk menghapus task
+export const deleteTask = async (token, taskId) => {
+  try {
+    const response = await fetch(`${API_URL}/${taskId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete task');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

@@ -116,6 +116,32 @@ const Task = () => {
     }
   };
 
+  const handleDeleteTask = async (taskId) => {
+    if (!taskId) {
+      console.error('Task ID is undefined');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch(`http://localhost:8080/api/tasks/${taskId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete task. Status: ${response.status}`);
+      }
+
+      setTasks(prevTasks => prevTasks.filter(task => task._id !== taskId));
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      alert('Failed to delete task. Please try again.');
+    }
+  };
+
   const ProfileSection = () => (
     <div className="h-full bg-customNavy flex flex-col justify-center items-center max-w-xs sm:max-w-lg px-4 py-5 sm:px-6 sm:py-7 rounded-xl space-y-5 shadow-md">
       <img className="w-25 h-25 sm:w-28 sm:h-28 rounded-full hover:scale-110" src={profileUrl} alt="Profile" />
