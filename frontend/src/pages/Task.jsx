@@ -49,6 +49,33 @@ const Task = () => {
     fetchUserProfile();
   }, []);
 
+  const handleAddTask = async () => {
+    if (newTask.trim()) {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('http://localhost:8080/api/tasks', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title: newTask }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to add task');
+        }
+
+        const result = await response.json();
+        setTasks(prevTasks => [...prevTasks, result.data]);
+        setNewTask('');
+      } catch (error) {
+        console.error('Error adding task:', error);
+        alert('Failed to add task. Please try again.');
+      }
+    }
+  };
+
   const ProfileSection = () => (
     <div className="h-full bg-customNavy flex flex-col justify-center items-center max-w-xs sm:max-w-lg px-4 py-5 sm:px-6 sm:py-7 rounded-xl space-y-5 shadow-md">
       <img className="w-25 h-25 sm:w-28 sm:h-28 rounded-full hover:scale-110" src={profileUrl} alt="Profile" />
