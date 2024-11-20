@@ -32,33 +32,65 @@ export const loginUser = async (email, password) => {
   }
 };
 
-
 // Function untuk get detail user
 export const getUserProfile = async () => {
-    const token = localStorage.getItem('token'); 
-  
-    if (!token) {
-      throw new Error('No token found');
+  const token = localStorage.getItem('token'); 
+
+  if (!token) {
+    throw new Error('No token found');
+  }
+
+  const url = `${API_BASE_URL}/users/profile`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`, 
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error fetching profile: ${response.status}`);
     }
-  
-    const url = `${API_BASE_URL}/users/profile`;
-  
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`, 
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Error fetching profile: ${response.status}`);
-      }
-  
-      const result = await response.json();
-      return result.data; 
-    } catch (error) {
-      console.error('Error fetching profile:', error.message);
-      throw error;
+
+    const result = await response.json();
+    return result.data; 
+  } catch (error) {
+    console.error('Error fetching profile:', error.message);
+    throw error;
+  }
+};
+
+// Function untuk update profile user
+export const updateUserProfile = async (name, email, password, photo_url) => {
+  const url = `${API_BASE_URL}/users/profile`;
+  const token = localStorage.getItem('token'); 
+
+  if (!token) {
+    throw new Error('No token found');
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, email, password, photo_url }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
-  };
+
+    const result = await response.json();
+    console.log('Profile updated:', result);
+    return result.data; 
+  } catch (error) {
+    console.error('Error updating profile:', error.message);
+    throw error;
+  }
+};

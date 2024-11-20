@@ -1,104 +1,115 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { updateUserProfile } from '../api/user';
 
 const UpdateProfile = () => {
-  const [image, setImage] = useState(null);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(URL.createObjectURL(file));
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const updatedProfile = await updateUserProfile(name, email, password, photoUrl);
+      alert('Profile updated successfully!');
+      console.log('Updated profile:', updatedProfile);
+    } catch (error) {
+      console.error('Error:', error.message);
+      alert('Failed to update profile. Please try again!');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="bg-customNavy w-full max-w-sm sm:max-w-md px-4 py-3 sm:px-5 sm:py-4 rounded-[10px] shadow-md space-y-3">
       <Link to="/task" className="flex items-center space-x-2 font-medium text-purple-50 hover:text-purple-200 hover:scale-105 transition duration-300">
-        <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width={24} height={24} fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m15 19-7-7 7-7" />
+        <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19L7 12l8-7" />
         </svg>
-        <p className="text-xs">Edit Profile</p> 
+        <p className="text-xs">Back to Task</p>
       </Link>
 
-      <div className="flex flex-col justify-center items-center px-3 sm:px-4">
-        <div className="mb-4">
-          <img
-            className="w-24 h-24 sm:w-27 sm:h-27 rounded-full object-cover transition-transform duration-300 hover:scale-110"
-            src={image || '../../public/fotoprofile.jpg'} 
-            alt="Profile"/>
+      <form onSubmit={handleUpdate} className="space-y-4">
+        {/* Photo Preview */}
+        {photoUrl && (
+          <div className="flex justify-center mb-4">
+            <img
+              src={photoUrl}
+              alt="Profile"
+              className="w-24 h-24 rounded-full object-cover"
+            />
+          </div>
+        )}
+
+        {/* Profile URL */}
+        <div>
+          <label htmlFor="photoUrl" className="block text-xs font-medium text-purple-50">Profile URL</label>
+          <input
+            type="text"
+            id="photoUrl"
+            value={photoUrl}
+            onChange={(e) => setPhotoUrl(e.target.value)}
+            placeholder="Enter photo URL"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg w-full p-2"
+          />
         </div>
 
-        <input
-          type="file"
-          id="profile"
-          className="hidden"
-          onChange={handleImageChange}/>
+        {/* Name */}
+        <div>
+          <label htmlFor="name" className="block text-xs font-medium text-purple-50">Name</label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg w-full p-2"
+            required
+          />
+        </div>
 
-        {/* Form Update Profile*/}
-        <form className="w-full space-y-4 sm:p-2 mt-2 sm:mt-2">
-          {/* Profile URL */}
-          <div>
-            <label htmlFor="profileUrl" className="block text-xs font-medium text-purple-50">Profile URL</label>
-            <input
-              type="text"
-              name="profileUrl"
-              id="profileUrl"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-2 mt-1 placeholder:text-xs hover:bg-yellow-50"
-              placeholder="<Image URL>"
-              required/>
-          </div>
+        {/* Email */}
+        <div>
+          <label htmlFor="email" className="block text-xs font-medium text-purple-50">Email</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Your email"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg w-full p-2"
+            required
+          />
+        </div>
 
-          {/* Name */}
-          <div>
-            <label htmlFor="name" className="block text-xs font-medium text-purple-50">Name</label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-2 mt-1 placeholder:text-xs hover:bg-yellow-50"
-              placeholder="Nazwa Praditta"
-              required/>
-          </div>
+        {/* Password */}
+        <div>
+          <label htmlFor="password" className="block text-xs font-medium text-purple-50">Password</label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="New password"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg w-full p-2"
+            required
+          />
+        </div>
 
-          {/* Email */}
-          <div>
-            <label htmlFor="email" className="block text-xs font-medium text-purple-50">Email</label>
-            <input
-              type="email"
-              name="email"
-              id="email"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-2 mt-1 placeholder:text-xs hover:bg-yellow-50"
-              placeholder="nazwa.praditta@gmail.com"
-              required/>
-          </div>
-
-          {/* Password */}
-          <div>
-            <label htmlFor="password" className="block text-xs font-medium text-purple-50">Password</label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              placeholder="* * * * * * * *"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-lg block w-full p-2 mt-1 placeholder:text-xs hover:bg-yellow-50"
-              required/>
-          </div>
-
-          {/* Submit Button */}
-          <div className="mt-4">
-            <Link to="/task">
-              <button
-                type="submit"
-                className="w-full flex justify-center items-center bg-yellow-500 hover:bg-yellow-200 text-gray-900 font-medium rounded-lg text-sm px-3 py-2 mt-4 transition duration-300">
-                <svg className="w-5 h-5 text-gray-900 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width={24} height={24} fill="none" viewBox="0 0 24 24">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 11.917 9.724 16.5 19 7.5" />
-                </svg>
-                <p className="font-semibold">Submit</p>
-              </button>
-            </Link>
-          </div>
-        </form>
-      </div>
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="w-full bg-yellow-500 hover:bg-yellow-200 text-gray-900 font-medium rounded-lg text-sm px-4 py-2"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Updating...' : 'Update Profile'}
+        </button>
+      </form>
     </div>
   );
 };
