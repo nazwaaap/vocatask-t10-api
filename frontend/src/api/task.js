@@ -43,3 +43,26 @@ export const addTask = async (newTask) => {
 
   return await response.json();
 };
+
+// Function untuk update task
+export const updateTask = async (token, taskId, updatedTask) => {
+  try {
+    const response = await fetch(`${API_URL}/${taskId}/done`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedTask),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update task status');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

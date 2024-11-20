@@ -76,6 +76,46 @@ const Task = () => {
     }
   };
 
+  const toggleTaskStatus = async (taskId) => {
+    if (!taskId) {
+      console.error('Task ID is undefined');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    try {
+      const currentTask = tasks.find(task => task._id === taskId);
+      if (!currentTask) return;
+
+      const response = await fetch(`http://localhost:8080/api/tasks/${taskId}/done`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ isDone: !currentTask.isDone })  
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update task. Status: ${response.status}`);
+      }
+
+      const updatedTaskData = await response.json();
+      console.log('Updated task response:', updatedTaskData);
+
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task._id === taskId
+            ? { ...task, isDone: !task.isDone }  
+            : task
+        )
+      );
+    } catch (error) {
+      console.error('Error updating task:', error);
+      alert('Failed to update task status. Please try again.');
+    }
+  };
+
   const ProfileSection = () => (
     <div className="h-full bg-customNavy flex flex-col justify-center items-center max-w-xs sm:max-w-lg px-4 py-5 sm:px-6 sm:py-7 rounded-xl space-y-5 shadow-md">
       <img className="w-25 h-25 sm:w-28 sm:h-28 rounded-full hover:scale-110" src={profileUrl} alt="Profile" />
